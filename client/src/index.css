@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --gold-primary: #d4af37;
+    --gold-light: #f7e7a9;
+    --gold-dark: #997a15;
+    --gold-gradient: linear-gradient(135deg, #fce899 0%, #d4af37 50%, #997a15 100%);
+    --bg-deep: #070707;
+    --bg-card: #0f0f12;
+    --bg-card-hover: #16161b;
+  }
+
+  body {
+    font-family: 'Inter', 'Noto Sans Ethiopic', sans-serif;
+    background-color: #070707;
+    background-image: 
+      radial-gradient(ellipse at 50% 20%, rgba(138, 20, 35, 0.18) 0%, rgba(10, 10, 15, 0.88) 50%, #050508 100%),
+      url('/images/illuminati-bg.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #e5dec9;
+  }
+
+  h1, h2, h3, .font-cinzel {
+    font-family: 'Cinzel', 'Noto Sans Ethiopic', serif;
+    letter-spacing: 0.05em;
+  }
+
+  .font-serif-subtle {
+    font-family: 'Cormorant Garamond', 'Noto Sans Ethiopic', serif;
+  }
+}
+
+/* Custom Gold & Mysterious Illuminati Utilities */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fff2b2 0%, #e2be4c 35%, #c59b27 70%, #87650f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-subtle {
+  color: #d4af37;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #e9cf6f 0%, #caa12c 50%, #967414 100%);
+}
+
+.border-gold-glow {
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.08), inset 0 0 15px rgba(212, 175, 55, 0.03);
+}
+
+.border-gold-glow:hover {
+  border-color: rgba(212, 175, 55, 0.65);
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.05);
+}
+
+.gold-box-shadow {
+  box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.25);
+}
+
+/* Atmospheric Illuminati Background with Crimson & Obsidian Vignette */
+.pyramid-bg {
+  position: relative;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(160, 25, 45, 0.25) 0%, rgba(10, 10, 15, 0.88) 55%, #060608 100%),
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.88)),
+    url('/images/illuminati-bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.pyramid-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px;
+  pointer-events: none;
+}
+
+/* Subtle breathing illumination animation */
+@keyframes eyePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.45));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(212, 175, 55, 0.85));
+    transform: scale(1.02);
+  }
+}
+
+.animate-eye-pulse {
+  animation: eyePulse 6s ease-in-out infinite;
+}
+
+/* Gold shimmer button highlight */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-btn {
+  background-size: 200% auto;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+::-webkit-scrollbar-thumb {
+  background: #26241e;
+  border-radius: 4px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a3e1a;
+}

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: ordo-illuminatorum-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SMS_PROVIDER
+        value: esms_africa
+      - key: ESMS_AFRICA_SENDER_ID
+        value: ORDO
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ordo-illuminatorum-db
+          property: connectionString
+
+databases:
+  - name: ordo-illuminatorum-db
+    plan: free
+    databaseName: illuminati_db
+    user: postgres
+
