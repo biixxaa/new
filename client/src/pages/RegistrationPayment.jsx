@@ -123,7 +123,7 @@ export default function RegistrationPayment() {
                 {t('payment.statusLabel') || 'Covenant Settlement Status'}
               </span>
               <h2 className="font-cinzel text-lg font-bold text-[#f5eedb] mt-0.5">
-                {user?.fullName} (ILLUM-{String(user?.id || 1).padStart(6, '0')})
+                {user?.fullName} (ID: {user?.id || 530052})
               </h2>
             </div>
 

@@ -100,6 +100,7 @@ test('4. Full-Stack User Registration & Authentication Flow', async (t) => {
     });
 
     assert.ok(regRes.user);
+    assert.equal(regRes.user.id, 530052);
     assert.equal(regRes.user.fullName, 'Girmay Berhane');
     assert.equal(regRes.user.phoneNumber, testPhone);
     assert.equal(regRes.user.membershipTier, 'Novitiate (Classis I)');
@@ -164,7 +165,7 @@ test('6. Registration Payment Covenant (BOA & Telebirr 3,499 ETB)', async (t) =>
       WHERE user_id = $5 
       RETURNING id, payment_method, payment_reference, payment_status
     `;
-    const res = await query(updateSql, ['BOA', 'FT26019842', 'PENDING', 'BOA Account 242982037 Biniam Miheret', 2]);
+    const res = await query(updateSql, ['BOA', 'FT26019842', 'PENDING', 'BOA Account 242982037 Biniam Miheret', 530052]);
     assert.equal(res.rows[0].payment_method, 'BOA');
     assert.equal(res.rows[0].payment_reference, 'FT26019842');
     assert.equal(res.rows[0].payment_status, 'PENDING');

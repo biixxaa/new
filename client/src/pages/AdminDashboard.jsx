@@ -265,7 +265,7 @@ export default function AdminDashboard() {
                           <td className="py-3.5 px-4">
                             <div className="font-semibold text-[#f5eedb]">{u.fullName}</div>
                             <span className="text-[10px] font-mono text-[#8c8678]">
-                              ID: ILLUM-{String(u.id).padStart(6, '0')} • {u.membershipTier || 'Novitiate'}
+                              ID: #{u.id} • {u.membershipTier || 'Novitiate'}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-mono text-[#cfc8b8]">

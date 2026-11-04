@@ -49,7 +49,7 @@ const embeddedStore = {
   sessions: [],
   audit_logs: [],
   nextIds: {
-    users: 2,
+    users: 530052,
     otp_verifications: 1,
     membership_applications: 1,
     membership_types: 5,

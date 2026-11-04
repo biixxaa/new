@@ -92,7 +92,7 @@ export default function MemberDashboard() {
               {t('dashboard.memberId')}
             </span>
             <span className="text-sm font-mono font-bold text-[#ffd966] mt-0.5">
-              {user?.id ? `ILLUM-${String(user.id).padStart(6, '0')}` : 'ILLUM-000001'}
+              {user?.id ? user.id : '530052'}
             </span>
             <span className="text-xs text-[#7d786d] mt-1 font-mono">{user?.phoneNumber}</span>
           </div>

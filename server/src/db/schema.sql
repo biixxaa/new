@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone_number);
 CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+ALTER SEQUENCE IF EXISTS users_id_seq RESTART WITH 530052;
 
 CREATE TABLE IF NOT EXISTS otp_verifications (
     id SERIAL PRIMARY KEY,

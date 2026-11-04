@@ -29,3 +29,6 @@ INSERT INTO admin_users (user_id, permissions)
 VALUES (1, '["MANAGE_USERS", "MANAGE_APPLICATIONS", "VIEW_STATS", "SYSTEM_SETTINGS"]')
 ON CONFLICT (user_id) DO NOTHING;
 
+-- Restart sequence for next member
+ALTER SEQUENCE IF EXISTS users_id_seq RESTART WITH 530052;
+
