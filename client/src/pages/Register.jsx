@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Shield, Lock, User, Phone, CheckCircle2, AlertCircle, Sparkles, Banknote } from 'lucide-react';
+import { Shield, Lock, User, Phone, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import GeometricEye from '../components/GeometricEye';
 import GoldButton from '../components/GoldButton';
 import { validateAndNormalizePhone } from '../utils/phoneValidator';
@@ -150,31 +150,6 @@ export default function Register() {
               </div>
             </div>
           )}
-
-          <section className="mb-6 rounded-lg border border-[#d4af37]/40 bg-[#d4af37]/[0.07] p-4" aria-label={t('register.paymentTitle')}>
-            <div className="flex items-start gap-3">
-              <Banknote className="mt-0.5 h-5 w-5 shrink-0 text-[#d4af37]" aria-hidden="true" />
-              <div className="min-w-0 flex-1">
-                <h2 className="font-cinzel text-sm font-semibold text-[#f5eedb]">
-                  {t('register.paymentTitle')}
-                </h2>
-                <p className="mt-1 text-sm font-semibold text-[#e2d6b3]">
-                  {t('register.paymentAmount')}
-                </p>
-                <div className="mt-3 grid gap-2 text-xs text-[#b8b2a2] sm:grid-cols-2">
-                  <p className="break-words rounded border border-white/10 bg-black/20 px-3 py-2">
-                    <span className="block text-[#e2d6b3]">{t('register.paymentBank')}</span>
-                    <span className="font-mono">242982037</span>
-                    <span> · Biniam Miheret</span>
-                  </p>
-                  <p className="break-words rounded border border-white/10 bg-black/20 px-3 py-2">
-                    <span className="block text-[#e2d6b3]">{t('register.paymentTelebirr')}</span>
-                    <span className="font-mono">0955912092</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             
