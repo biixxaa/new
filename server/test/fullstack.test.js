@@ -156,3 +156,30 @@ test('5. Admin Privileges & Council Decrees', async (t) => {
   });
 });
 
+test('6. Registration Payment Covenant (BOA & Telebirr 3,499 ETB)', async (t) => {
+  await t.test('Records payment proof submission via BOA or Telebirr', async () => {
+    const updateSql = `
+      UPDATE membership_applications 
+      SET payment_method = $1, payment_reference = $2, payment_status = $3, notes = $4 
+      WHERE user_id = $5 
+      RETURNING id, payment_method, payment_reference, payment_status
+    `;
+    const res = await query(updateSql, ['BOA', 'FT26019842', 'PENDING', 'BOA Account 242982037 Biniam Miheret', 2]);
+    assert.equal(res.rows[0].payment_method, 'BOA');
+    assert.equal(res.rows[0].payment_reference, 'FT26019842');
+    assert.equal(res.rows[0].payment_status, 'PENDING');
+  });
+
+  await t.test('Council Admin verifies registration payment', async () => {
+    const approveSql = `
+      UPDATE membership_applications 
+      SET status = $1, notes = $2, reviewed_by = $3, reviewed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $4
+      RETURNING id, status, payment_status
+    `;
+    const res = await query(approveSql, ['APPROVED', 'Payment and initiation covenant ratified', 1, 1]);
+    assert.equal(res.rows[0].status, 'APPROVED');
+    assert.equal(res.rows[0].payment_status, 'VERIFIED');
+  });
+});
+

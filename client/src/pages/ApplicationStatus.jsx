@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, Clock, ShieldAlert, Award, ArrowLeft, ShieldCheck, FileCheck } from 'lucide-react';
+import { CheckCircle2, Clock, ShieldAlert, Award, ArrowLeft, ShieldCheck, FileCheck, CreditCard } from 'lucide-react';
 import GeometricEye from '../components/GeometricEye';
 import GoldButton from '../components/GoldButton';
 import { useAuth } from '../context/AuthContext';
@@ -128,6 +128,30 @@ export default function ApplicationStatus() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Registration Payment Status Block */}
+          <div className="pt-6 border-t border-white/5 pb-2">
+            <div className="p-4 rounded-lg bg-[#14131c] border border-[#d4af37]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-mono tracking-widest text-[#aa820a] uppercase block">
+                  Registration Consecration Offering (3,499 ETB)
+                </span>
+                <p className="text-xs text-[#ded7c5] mt-1 font-serif-subtle">
+                  Bank of Abyssinia (BOA: 242982037 - Biniam Miheret) or Telebirr (0955912092 - Biniam Miheret)
+                </p>
+                {application?.payment_reference && (
+                  <span className="text-[11px] font-mono text-[#ffd966] block mt-1">
+                    Submitted Reference: {application.payment_reference} ({application.payment_method})
+                  </span>
+                )}
+              </div>
+              <Link to="/payment">
+                <GoldButton size="sm" icon={CreditCard}>
+                  {application?.payment_status === 'VERIFIED' ? 'Payment Verified' : 'Manage Payment / Reference'}
+                </GoldButton>
+              </Link>
+            </div>
           </div>
 
           {/* Council Remarks */}

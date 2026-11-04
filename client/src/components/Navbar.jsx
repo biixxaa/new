@@ -103,6 +103,16 @@ export default function Navbar() {
                 >
                   {t('nav.status')}
                 </Link>
+                <Link
+                  to="/payment"
+                  className={`font-cinzel text-xs tracking-wider uppercase transition-colors duration-200 ${
+                    isActive('/payment')
+                      ? 'text-[#f5e6b3] border-b-2 border-[#d4af37] pb-1'
+                      : 'text-[#ffd966] hover:text-[#fff0a8] font-semibold'
+                  }`}
+                >
+                  {t('nav.payment') || 'Registration Fee'}
+                </Link>
               </>
             )}
 
@@ -256,6 +266,17 @@ export default function Navbar() {
                   }`}
                 >
                   {t('nav.status')}
+                </Link>
+                <Link
+                  to="/payment"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`px-3 py-2 rounded text-sm font-cinzel ${
+                    isActive('/payment')
+                      ? 'bg-[#1e1c15] text-[#ffd966] font-semibold'
+                      : 'text-[#ffd966] hover:bg-[#15151e]'
+                  }`}
+                >
+                  {t('nav.payment') || 'Registration Fee'} (3,499 ETB)
                 </Link>
               </>
             )}

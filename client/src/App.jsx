@@ -11,6 +11,7 @@ import VerifyOtp from './pages/VerifyOtp';
 import Login from './pages/Login';
 import MemberDashboard from './pages/MemberDashboard';
 import ApplicationStatus from './pages/ApplicationStatus';
+import RegistrationPayment from './pages/RegistrationPayment';
 import AdminDashboard from './pages/AdminDashboard';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -43,6 +44,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <ApplicationStatus />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute>
+                  <RegistrationPayment />
                 </ProtectedRoute>
               }
             />

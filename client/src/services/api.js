@@ -41,6 +41,8 @@ export const api = {
   // Member
   getMemberApplication: () => request('/member/application'),
   updateMemberApplication: (body) => request('/member/apply', { method: 'POST', body: JSON.stringify(body) }),
+  getPaymentInfo: () => request('/member/payment'),
+  submitPayment: (body) => request('/member/payment', { method: 'POST', body: JSON.stringify(body) }),
 
   // Admin
   getAdminStats: () => request('/admin/stats'),

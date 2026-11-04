@@ -209,7 +209,11 @@ export async function query(sql, params = []) {
       user_id: id,
       membership_type_id: 1,
       status: 'PENDING',
-      notes: 'Initial petition inscribed via verified phone sigil.',
+      payment_method: null,
+      payment_reference: null,
+      payment_status: 'UNPAID',
+      amount: 3499.00,
+      notes: 'Initial petition inscribed via verified phone sigil. Consecration fee (3,499 ETB) awaiting settlement.',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });
@@ -292,12 +296,33 @@ export async function query(sql, params = []) {
     return { rows: apps };
   }
 
+  // UPDATE membership_applications payment
+  if (lower.startsWith('update membership_applications') && lower.includes('payment_method = $1')) {
+    const [method, ref, paymentStatus, notes, userId] = params;
+    const app = embeddedStore.membership_applications.find((a) => a.user_id === Number(userId) || a.id === Number(userId));
+    if (app) {
+      app.payment_method = method;
+      app.payment_reference = ref;
+      app.payment_status = paymentStatus;
+      if (notes) app.notes = notes;
+      app.status = 'UNDER_REVIEW';
+      app.updated_at = new Date().toISOString();
+      return { rows: [app] };
+    }
+    return { rows: [] };
+  }
+
   // UPDATE membership_applications status
   if (lower.startsWith('update membership_applications') && lower.includes('status = $1')) {
     const [newStatus, notes, reviewerId, appId] = params;
     const app = embeddedStore.membership_applications.find((a) => a.id === Number(appId) || a.user_id === Number(appId));
     if (app) {
       app.status = newStatus;
+      if (newStatus === 'APPROVED') {
+        app.payment_status = 'VERIFIED';
+      } else if (newStatus === 'REJECTED') {
+        app.payment_status = 'REJECTED';
+      }
       if (notes) app.notes = notes;
       if (reviewerId) app.reviewed_by = reviewerId;
       app.reviewed_at = new Date().toISOString();
@@ -341,6 +366,10 @@ export async function query(sql, params = []) {
         membershipTier: tier?.name || 'Novitiate',
         applicationId: app?.id || null,
         applicationStatus: app?.status || 'PENDING',
+        paymentMethod: app?.payment_method || null,
+        paymentReference: app?.payment_reference || null,
+        paymentStatus: app?.payment_status || 'UNPAID',
+        amount: app?.amount || 3499.00,
         createdAt: u.created_at,
       };
     });

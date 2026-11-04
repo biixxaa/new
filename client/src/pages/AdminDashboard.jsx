@@ -240,7 +240,7 @@ export default function AdminDashboard() {
                   <tr className="border-b border-[#d4af37]/20 font-cinzel text-[#d4af37] tracking-wider uppercase">
                     <th className="py-3 px-4">{t('admin.columns.user')}</th>
                     <th className="py-3 px-4">{t('admin.columns.phone')}</th>
-                    <th className="py-3 px-4">{t('admin.columns.degree')}</th>
+                    <th className="py-3 px-4">Fee (3,499 ETB)</th>
                     <th className="py-3 px-4">{t('admin.columns.verified')}</th>
                     <th className="py-3 px-4">{t('admin.columns.appStatus')}</th>
                     <th className="py-3 px-4">{t('admin.columns.registered')}</th>
@@ -265,7 +265,7 @@ export default function AdminDashboard() {
                           <td className="py-3.5 px-4">
                             <div className="font-semibold text-[#f5eedb]">{u.fullName}</div>
                             <span className="text-[10px] font-mono text-[#8c8678]">
-                              ID: ILLUM-{String(u.id).padStart(6, '0')} • {u.role}
+                              ID: ILLUM-{String(u.id).padStart(6, '0')} • {u.membershipTier || 'Novitiate'}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-mono text-[#cfc8b8]">
@@ -273,14 +273,27 @@ export default function AdminDashboard() {
                             <span className="text-[10px] text-[#aa820a]">{u.carrier || 'Mobile'}</span>
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="px-2 py-0.5 rounded bg-[#1c1b26] border border-[#d4af37]/30 text-[#e6d7a8] text-[10px] font-mono">
-                              {u.membershipTier || 'Novitiate'}
-                            </span>
+                            {u.paymentReference ? (
+                              <div>
+                                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-[#ffd966]">
+                                  {u.paymentMethod || 'REF'}: {u.paymentReference}
+                                </span>
+                                <span className={`block text-[10px] font-mono font-bold ${
+                                  u.paymentStatus === 'VERIFIED' ? 'text-emerald-400' : 'text-amber-400'
+                                }`}>
+                                  {u.paymentStatus || 'PENDING'}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] font-mono text-zinc-500">
+                                Unpaid (3,499 ETB)
+                              </span>
+                            )}
                           </td>
                           <td className="py-3.5 px-4">
                             {u.isPhoneVerified ? (
                               <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400">
-                                <CheckCircle className="w-3.5 h-3.5" /> OTP Verified
+                                <CheckCircle className="w-3.5 h-3.5" /> Verified
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">

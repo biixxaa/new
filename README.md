@@ -54,6 +54,21 @@ Language preference is persisted in `localStorage` (`i18nextLng`) and preserved 
 
 ---
 
+## 💳 Registration Fee Covenant (3,499 ETB)
+
+New members must settle the **3,499 ETB** initiation fee through one of the two official channels:
+
+1. **Bank of Abyssinia (BOA)**:
+   - **Account Number**: `242982037`
+   - **Account Holder**: `Biniam Miheret`
+2. **Telebirr**:
+   - **Mobile Number**: `0955912092`
+   - **Receiver**: `Biniam Miheret`
+
+Members can navigate to **Registration Fee** (`/payment`) directly from their Member Dashboard or navigation bar, copy the account details in 1 click, and submit their transaction reference number for High Council tribunal verification.
+
+---
+
 ## 🏛️ Website Pages
 
 | Path | Page Name | Description |
@@ -64,6 +79,7 @@ Language preference is persisted in `localStorage` (`i18nextLng`) and preserved 
 | `/verify-otp` | **Verification (OTP)** | 6-digit keypad inputs, auto-advance, 5-min timer, 60s resend cooldown, golden confetti |
 | `/login` | **Enter Sanctum (Login)** | Member authentication via phone number and secret seal passcode |
 | `/dashboard` | **Member Vault** | Member ID inscription, degree badge, status review, council decrees |
+| `/payment` | **Registration Fee** | Dedicated payment page: BOA (242982037 Biniam Miheret) or Telebirr (0955912092), submit transaction ref for 3,499 ETB fee |
 | `/application-status` | **Petition Status** | 3-stage tribunal progression tracker (Hashed, Review, Consecration) |
 | `/admin` | **Council Archive** | Protected admin dashboard: metrics, user search, approve/reject decrees, suspension |
 | `/terms` | **Charter & Oath** | Fictional society constitution, non-disclosure covenant |

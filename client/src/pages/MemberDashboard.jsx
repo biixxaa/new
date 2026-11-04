@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Shield, CheckCircle, Clock, Award, FileText, Bell, Sparkles, ExternalLink } from 'lucide-react';
+import { Shield, CheckCircle, Clock, Award, FileText, Bell, Sparkles, ExternalLink, CreditCard } from 'lucide-react';
 import GeometricEye from '../components/GeometricEye';
 import GoldButton from '../components/GoldButton';
 import { useAuth } from '../context/AuthContext';
@@ -95,6 +95,48 @@ export default function MemberDashboard() {
               {user?.id ? `ILLUM-${String(user.id).padStart(6, '0')}` : 'ILLUM-000001'}
             </span>
             <span className="text-xs text-[#7d786d] mt-1 font-mono">{user?.phoneNumber}</span>
+          </div>
+        </div>
+
+        {/* Registration Fee Covenant Navigation Card */}
+        <div className="bg-gradient-to-r from-[#14121a] via-[#1a1714] to-[#12121c] border-2 border-[#d4af37]/40 rounded-xl p-6 gold-box-shadow flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div className="flex items-center gap-4 z-10">
+            <div className="p-3.5 rounded-full bg-amber-950/60 border border-amber-600/50 text-[#ffd966] shadow-lg flex-shrink-0">
+              <CreditCard className="w-6 h-6 text-[#ffd966]" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-cinzel uppercase tracking-wider text-[#d4af37] font-bold">
+                  {t('dashboard.paymentNavTitle') || 'Registration Initiation Fee (3,499 ETB)'}
+                </span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                  application?.payment_status === 'VERIFIED'
+                    ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500'
+                    : application?.payment_status === 'PENDING'
+                    ? 'bg-amber-950/60 text-amber-300 border-amber-500 animate-pulse'
+                    : 'bg-red-950/40 text-red-300 border-red-700/50'
+                }`}>
+                  {application?.payment_status === 'VERIFIED'
+                    ? (t('payment.statusVerified') || 'PAID & SANCTIFIED')
+                    : application?.payment_status === 'PENDING'
+                    ? (t('payment.statusPending') || 'VERIFICATION PENDING')
+                    : (t('payment.statusUnpaid') || 'AWAITING PAYMENT')}
+                </span>
+              </div>
+              <p className="font-serif-subtle text-xs sm:text-sm text-[#ccc5b0] mt-1 max-w-xl">
+                {t('payment.navCardSummary') || 'New members must settle the 3,499 ETB fee through Bank of Abyssinia (BOA: 242982037 - Biniam Miheret) or Telebirr (0955912092 - Biniam Miheret).'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-shrink-0 z-10 w-full md:w-auto">
+            <Link to="/payment">
+              <GoldButton size="md" icon={CreditCard} className="w-full md:w-auto shadow-md">
+                {application?.payment_status === 'VERIFIED'
+                  ? (t('payment.viewReceiptBtn') || 'View Payment Record')
+                  : (t('payment.settleFeeBtn') || 'Settle Registration Fee')}
+              </GoldButton>
+            </Link>
           </div>
         </div>
 

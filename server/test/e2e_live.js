@@ -53,6 +53,35 @@ async function runE2ETest() {
     tier: loginData.user?.membershipTier,
     token: loginData.token?.slice(0, 25) + '...',
   });
+  const memberToken = loginData.token;
+
+  console.log('\n--- 5b. Fetching Member Registration Payment Info ---');
+  const payInfoRes = await fetch(`${BASE}/member/payment`, {
+    headers: { Authorization: `Bearer ${memberToken}` },
+  });
+  const payInfo = await payInfoRes.json();
+  console.log('Payment Info (Accounts & Required Fee):', {
+    amount: payInfo.config?.amount,
+    boa: payInfo.config?.accounts?.boa,
+    telebirr: payInfo.config?.accounts?.telebirr,
+    currentStatus: payInfo.payment?.paymentStatus,
+  });
+
+  console.log('\n--- 5c. Submitting Payment Proof via BOA (3,499 ETB) ---');
+  const paySubRes = await fetch(`${BASE}/member/payment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${memberToken}`,
+    },
+    body: JSON.stringify({
+      paymentMethod: 'BOA',
+      paymentReference: 'FT26019842',
+      notes: 'Deposited to BOA Acc 242982037 Biniam Miheret',
+    }),
+  });
+  const paySub = await paySubRes.json();
+  console.log('Payment Submission Result:', paySub.message);
 
   console.log('\n--- 6. Logging In Admin ---');
   const adminRes = await fetch(`${BASE}/auth/login`, {
