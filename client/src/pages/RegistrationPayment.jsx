@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { 
-  CreditCard, CheckCircle2, Copy, Check, Clock, AlertCircle, ArrowLeft, 
+import {
+  CreditCard, CheckCircle2, Copy, Check, Clock, AlertCircle, ArrowLeft,
   Building2, Smartphone, ShieldCheck, Sparkles, Send
 } from 'lucide-react';
 import GeometricEye from '../components/GeometricEye';
@@ -14,6 +14,23 @@ export default function RegistrationPayment() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
+  const [paymentConfig, setPaymentConfig] = useState({
+    amount: 3499,
+    currency: 'ETB',
+    accounts: {
+      boa: {
+        bankName: 'Bank of Abyssinia (BOA)',
+        accountNumber: '242982037',
+        accountHolder: 'Biniam Miheret',
+      },
+      telebirr: {
+        provider: 'Telebirr',
+        phoneNumber: '0955912092',
+        accountHolder: 'Biniam Miheret',
+      },
+    },
+  });
+
   const [paymentData, setPaymentData] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState('BOA');
   const [transactionRef, setTransactionRef] = useState('');
@@ -24,24 +41,13 @@ export default function RegistrationPayment() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const boaDetails = {
-    bank: 'Bank of Abyssinia (BOA)',
-    accountNumber: '242982037',
-    accountHolder: 'Biniam Miheret',
-    amount: '3,499 ETB',
-  };
-
-  const telebirrDetails = {
-    provider: 'Telebirr',
-    phoneNumber: '0955912092',
-    accountHolder: 'Biniam Miheret',
-    amount: '3,499 ETB',
-  };
-
   const loadPaymentInfo = async () => {
     setLoading(true);
     try {
       const res = await api.getPaymentInfo();
+      if (res.config) {
+        setPaymentConfig(res.config);
+      }
       if (res.payment) {
         setPaymentData(res.payment);
         if (res.payment.paymentMethod) {
@@ -94,12 +100,15 @@ export default function RegistrationPayment() {
     }
   };
 
+  const formattedAmount = `${paymentConfig.amount.toLocaleString()} ${paymentConfig.currency}`;
   const paymentStatus = paymentData?.paymentStatus || 'UNPAID';
+  const boa = paymentConfig.accounts.boa;
+  const telebirr = paymentConfig.accounts.telebirr;
 
   return (
     <div className="pyramid-bg min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        
+
         {/* Header */}
         <div className="text-center">
           <GeometricEye size={72} glow={true} />
@@ -111,7 +120,7 @@ export default function RegistrationPayment() {
             {t('payment.title') || 'Registration Fee Settlement'}
           </h1>
           <p className="font-serif-subtle text-sm sm:text-base text-[#cfc8b4] mt-2 max-w-xl mx-auto">
-            {t('payment.subtitle') || 'To seal your sacred inscription into the Sovereign Order, complete the 3,499 ETB registration covenant via Bank of Abyssinia or Telebirr.'}
+            {t('payment.subtitle', { fee: formattedAmount }) || `To seal your sacred inscription into the Sovereign Order, complete the ${formattedAmount} registration covenant via Bank of Abyssinia or Telebirr.`}
           </p>
         </div>
 
@@ -123,21 +132,20 @@ export default function RegistrationPayment() {
                 {t('payment.statusLabel') || 'Covenant Settlement Status'}
               </span>
               <h2 className="font-cinzel text-lg font-bold text-[#f5eedb] mt-0.5">
-                {user?.fullName} (ID: {user?.id || 530052})
+                {user?.fullName || 'Initiate Member'} (ID: {user?.id || 530052})
               </h2>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono uppercase text-[#a8a192]">Status:</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold border flex items-center gap-1.5 ${
-                paymentStatus === 'VERIFIED'
-                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500'
-                  : paymentStatus === 'PENDING'
+              <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold border flex items-center gap-1.5 ${paymentStatus === 'VERIFIED'
+                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500'
+                : paymentStatus === 'PENDING'
                   ? 'bg-amber-950/60 text-amber-300 border-amber-500 animate-pulse'
                   : paymentStatus === 'REJECTED'
-                  ? 'bg-red-950/60 text-red-300 border-red-500'
-                  : 'bg-zinc-900 text-zinc-300 border-zinc-700'
-              }`}>
+                    ? 'bg-red-950/60 text-red-300 border-red-500'
+                    : 'bg-zinc-900 text-zinc-300 border-zinc-700'
+                }`}>
                 {paymentStatus === 'VERIFIED' && <CheckCircle2 className="w-3.5 h-3.5" />}
                 {paymentStatus === 'PENDING' && <Clock className="w-3.5 h-3.5" />}
                 {paymentStatus === 'REJECTED' && <AlertCircle className="w-3.5 h-3.5" />}
@@ -149,20 +157,19 @@ export default function RegistrationPayment() {
           {paymentData?.paymentReference && (
             <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between text-xs font-mono text-[#a8a192]">
               <span>Recorded Reference: <strong className="text-[#ffd966]">{paymentData.paymentReference}</strong> ({paymentData.paymentMethod})</span>
-              <span>Required: <strong className="text-emerald-400">3,499 ETB</strong></span>
+              <span>Required: <strong className="text-emerald-400">{formattedAmount}</strong></span>
             </div>
           )}
         </div>
 
         {/* Two Payment Options Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           {/* Bank of Abyssinia (BOA) Card */}
-          <div className={`p-6 rounded-xl border transition-all duration-300 bg-[#0d0d14]/95 ${
-            selectedMethod === 'BOA'
-              ? 'border-[#d4af37] ring-1 ring-[#d4af37]/60 shadow-xl shadow-amber-950/40'
-              : 'border-[#d4af37]/25 hover:border-[#d4af37]/50'
-          }`}>
+          <div className={`p-6 rounded-xl border transition-all duration-300 bg-[#0d0d14]/95 ${selectedMethod === 'BOA'
+            ? 'border-[#d4af37] ring-1 ring-[#d4af37]/60 shadow-xl shadow-amber-950/40'
+            : 'border-[#d4af37]/25 hover:border-[#d4af37]/50'
+            }`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <div className="p-2.5 rounded bg-[#181824] border border-[#d4af37]/40 text-[#d4af37]">
@@ -170,7 +177,7 @@ export default function RegistrationPayment() {
                 </div>
                 <div>
                   <h3 className="font-cinzel text-base font-bold text-[#f5eedb]">
-                    Bank of Abyssinia (BOA)
+                    {boa.bankName}
                   </h3>
                   <span className="text-[10px] font-mono text-[#aa820a] uppercase tracking-wider">
                     Bank Transfer / Mobile Banking
@@ -178,7 +185,7 @@ export default function RegistrationPayment() {
                 </div>
               </div>
               <span className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-600/40 text-emerald-300 font-mono text-xs font-bold">
-                3,499 ETB
+                {formattedAmount}
               </span>
             </div>
 
@@ -186,11 +193,11 @@ export default function RegistrationPayment() {
               <div className="p-3 rounded bg-[#13131c] border border-white/5 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-[#8c8678] uppercase block">Account Number</span>
-                  <span className="text-sm font-bold text-[#ffd966]">{boaDetails.accountNumber}</span>
+                  <span className="text-sm font-bold text-[#ffd966]">{boa.accountNumber}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(boaDetails.accountNumber, 'boa_acc')}
+                  onClick={() => copyToClipboard(boa.accountNumber, 'boa_acc')}
                   className="px-2.5 py-1.5 rounded bg-[#1f1e2b] border border-[#d4af37]/30 text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition-all flex items-center gap-1 cursor-pointer"
                 >
                   {copiedKey === 'boa_acc' ? (
@@ -210,11 +217,11 @@ export default function RegistrationPayment() {
               <div className="p-3 rounded bg-[#13131c] border border-white/5 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-[#8c8678] uppercase block">Account Name</span>
-                  <span className="text-sm text-[#e2dac5] font-semibold">{boaDetails.accountHolder}</span>
+                  <span className="text-sm text-[#e2dac5] font-semibold">{boa.accountHolder}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(boaDetails.accountHolder, 'boa_name')}
+                  onClick={() => copyToClipboard(boa.accountHolder, 'boa_name')}
                   className="px-2.5 py-1.5 rounded bg-[#1f1e2b] border border-[#d4af37]/30 text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition-all flex items-center gap-1 cursor-pointer"
                 >
                   {copiedKey === 'boa_name' ? (
@@ -236,11 +243,10 @@ export default function RegistrationPayment() {
               <button
                 type="button"
                 onClick={() => setSelectedMethod('BOA')}
-                className={`w-full py-2 rounded text-xs font-cinzel uppercase tracking-wider transition-all cursor-pointer ${
-                  selectedMethod === 'BOA'
-                    ? 'bg-[#d4af37] text-black font-bold'
-                    : 'bg-[#151520] text-[#c7beac] hover:bg-[#1d1d2c]'
-                }`}
+                className={`w-full py-2 rounded text-xs font-cinzel uppercase tracking-wider transition-all cursor-pointer ${selectedMethod === 'BOA'
+                  ? 'bg-[#d4af37] text-black font-bold'
+                  : 'bg-[#151520] text-[#c7beac] hover:bg-[#1d1d2c]'
+                  }`}
               >
                 {selectedMethod === 'BOA' ? 'Selected Payment Method' : 'Pay via Bank of Abyssinia'}
               </button>
@@ -248,11 +254,10 @@ export default function RegistrationPayment() {
           </div>
 
           {/* Telebirr Card */}
-          <div className={`p-6 rounded-xl border transition-all duration-300 bg-[#0d0d14]/95 ${
-            selectedMethod === 'TELEBIRR'
-              ? 'border-[#d4af37] ring-1 ring-[#d4af37]/60 shadow-xl shadow-amber-950/40'
-              : 'border-[#d4af37]/25 hover:border-[#d4af37]/50'
-          }`}>
+          <div className={`p-6 rounded-xl border transition-all duration-300 bg-[#0d0d14]/95 ${selectedMethod === 'TELEBIRR'
+            ? 'border-[#d4af37] ring-1 ring-[#d4af37]/60 shadow-xl shadow-amber-950/40'
+            : 'border-[#d4af37]/25 hover:border-[#d4af37]/50'
+            }`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <div className="p-2.5 rounded bg-[#181824] border border-[#d4af37]/40 text-[#d4af37]">
@@ -260,7 +265,7 @@ export default function RegistrationPayment() {
                 </div>
                 <div>
                   <h3 className="font-cinzel text-base font-bold text-[#f5eedb]">
-                    Telebirr
+                    {telebirr.provider}
                   </h3>
                   <span className="text-[10px] font-mono text-[#aa820a] uppercase tracking-wider">
                     Instant Mobile Payment
@@ -268,7 +273,7 @@ export default function RegistrationPayment() {
                 </div>
               </div>
               <span className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-600/40 text-emerald-300 font-mono text-xs font-bold">
-                3,499 ETB
+                {formattedAmount}
               </span>
             </div>
 
@@ -276,11 +281,11 @@ export default function RegistrationPayment() {
               <div className="p-3 rounded bg-[#13131c] border border-white/5 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-[#8c8678] uppercase block">Telebirr Mobile Number</span>
-                  <span className="text-sm font-bold text-[#ffd966]">{telebirrDetails.phoneNumber}</span>
+                  <span className="text-sm font-bold text-[#ffd966]">{telebirr.phoneNumber}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(telebirrDetails.phoneNumber, 'tele_phone')}
+                  onClick={() => copyToClipboard(telebirr.phoneNumber, 'tele_phone')}
                   className="px-2.5 py-1.5 rounded bg-[#1f1e2b] border border-[#d4af37]/30 text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition-all flex items-center gap-1 cursor-pointer"
                 >
                   {copiedKey === 'tele_phone' ? (
@@ -300,11 +305,11 @@ export default function RegistrationPayment() {
               <div className="p-3 rounded bg-[#13131c] border border-white/5 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-[#8c8678] uppercase block">Registered Receiver</span>
-                  <span className="text-sm text-[#e2dac5] font-semibold">{telebirrDetails.accountHolder}</span>
+                  <span className="text-sm text-[#e2dac5] font-semibold">{telebirr.accountHolder}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(telebirrDetails.accountHolder, 'tele_name')}
+                  onClick={() => copyToClipboard(telebirr.accountHolder, 'tele_name')}
                   className="px-2.5 py-1.5 rounded bg-[#1f1e2b] border border-[#d4af37]/30 text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition-all flex items-center gap-1 cursor-pointer"
                 >
                   {copiedKey === 'tele_name' ? (
@@ -326,11 +331,10 @@ export default function RegistrationPayment() {
               <button
                 type="button"
                 onClick={() => setSelectedMethod('TELEBIRR')}
-                className={`w-full py-2 rounded text-xs font-cinzel uppercase tracking-wider transition-all cursor-pointer ${
-                  selectedMethod === 'TELEBIRR'
-                    ? 'bg-[#d4af37] text-black font-bold'
-                    : 'bg-[#151520] text-[#c7beac] hover:bg-[#1d1d2c]'
-                }`}
+                className={`w-full py-2 rounded text-xs font-cinzel uppercase tracking-wider transition-all cursor-pointer ${selectedMethod === 'TELEBIRR'
+                  ? 'bg-[#d4af37] text-black font-bold'
+                  : 'bg-[#151520] text-[#c7beac] hover:bg-[#1d1d2c]'
+                  }`}
               >
                 {selectedMethod === 'TELEBIRR' ? 'Selected Payment Method' : 'Pay via Telebirr'}
               </button>
@@ -348,7 +352,7 @@ export default function RegistrationPayment() {
                 {t('payment.submitTitle') || 'Submit Sacred Payment Proof'}
               </h3>
               <p className="font-serif-subtle text-xs text-[#a8a192]">
-                {t('payment.submitSubtitle') || 'After completing your transfer of 3,499 ETB, input the transaction reference code received from BOA or Telebirr.'}
+                {t('payment.submitSubtitle') || `After completing your transfer of ${formattedAmount}, input the transaction reference code received from BOA or Telebirr.`}
               </p>
             </div>
           </div>
@@ -381,22 +385,20 @@ export default function RegistrationPayment() {
                 <button
                   type="button"
                   onClick={() => setSelectedMethod('BOA')}
-                  className={`py-2 px-3 rounded border text-xs font-mono transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                    selectedMethod === 'BOA'
-                      ? 'bg-amber-950/40 border-[#d4af37] text-[#ffd966] font-bold'
-                      : 'bg-[#13131c] border-white/10 text-[#8c8678]'
-                  }`}
+                  className={`py-2 px-3 rounded border text-xs font-mono transition-all flex items-center justify-center gap-2 cursor-pointer ${selectedMethod === 'BOA'
+                    ? 'bg-amber-950/40 border-[#d4af37] text-[#ffd966] font-bold'
+                    : 'bg-[#13131c] border-white/10 text-[#8c8678]'
+                    }`}
                 >
                   <Building2 className="w-4 h-4" /> Bank of Abyssinia (BOA)
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedMethod('TELEBIRR')}
-                  className={`py-2 px-3 rounded border text-xs font-mono transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                    selectedMethod === 'TELEBIRR'
-                      ? 'bg-amber-950/40 border-[#d4af37] text-[#ffd966] font-bold'
-                      : 'bg-[#13131c] border-white/10 text-[#8c8678]'
-                  }`}
+                  className={`py-2 px-3 rounded border text-xs font-mono transition-all flex items-center justify-center gap-2 cursor-pointer ${selectedMethod === 'TELEBIRR'
+                    ? 'bg-amber-950/40 border-[#d4af37] text-[#ffd966] font-bold'
+                    : 'bg-[#13131c] border-white/10 text-[#8c8678]'
+                    }`}
                 >
                   <Smartphone className="w-4 h-4" /> Telebirr
                 </button>
@@ -440,7 +442,7 @@ export default function RegistrationPayment() {
               >
                 {submitting
                   ? (t('payment.transmitting') || 'Inscribing Proof into Tribunal Vault...')
-                  : (t('payment.submitBtn') || 'Submit Consecration Proof (3,499 ETB)')}
+                  : (t('payment.submitBtn') || `Submit Consecration Proof (${formattedAmount})`)}
               </GoldButton>
             </div>
           </form>
@@ -461,4 +463,3 @@ export default function RegistrationPayment() {
     </div>
   );
 }
-
