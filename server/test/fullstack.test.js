@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { validateAndNormalizePhone } from '../src/utils/phoneValidator.js';
-import { formatOtpMessage } from '../src/services/smsService.js';
+import { formatOtpMessage, SMSEthiopiaProvider, smsService } from '../src/services/smsService.js';
 import { generateSecureOtp, hashOtp, sendOtpForPhone, verifyOtpForPhone } from '../src/services/otpService.js';
 import { hashPassword, comparePassword, registerUser, authenticateUser, generateToken, verifyToken } from '../src/services/authService.js';
 import { initDb, query } from '../src/db/index.js';
@@ -183,4 +183,34 @@ test('6. Registration Payment Covenant (BOA & Telebirr 3,499 ETB)', async (t) =>
     assert.equal(res.rows[0].payment_status, 'VERIFIED');
   });
 });
+
+test('7. SMSEthiopia Gateway Integration & Formatting', async (t) => {
+  const provider = new SMSEthiopiaProvider();
+
+  await t.test('Normalizes Ethiopian phone number to national msisdn 2519...', () => {
+    assert.equal(provider.formatMsisdn('+251908426432'), '251908426432');
+    assert.equal(provider.formatMsisdn('0908426432'), '251908426432');
+    assert.equal(provider.formatMsisdn('251908426432'), '251908426432');
+    assert.equal(provider.formatMsisdn('+251 908-426-432'), '251908426432');
+    assert.equal(provider.formatMsisdn('0771234567'), '251771234567');
+  });
+
+  await t.test('Identifies unconfigured state when placeholder API key is present', () => {
+    provider.apiKey = 'YOUR_ACTUAL_API_KEY';
+    assert.equal(provider.isConfigured(), false);
+    provider.apiKey = '';
+    assert.equal(provider.isConfigured(), false);
+  });
+
+  await t.test('Identifies configured state when legitimate API key is present', () => {
+    provider.apiKey = 'sec_live_9948281048123';
+    assert.equal(provider.isConfigured(), true);
+  });
+
+  await t.test('smsService selects SMSEthiopia as default provider', () => {
+    const activeProvider = smsService.getProvider();
+    assert.equal(activeProvider.name, 'SMSEthiopia');
+  });
+});
+
 
