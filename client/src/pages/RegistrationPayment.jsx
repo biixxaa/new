@@ -15,8 +15,6 @@ export default function RegistrationPayment() {
   const { user } = useAuth();
 
   const [paymentConfig, setPaymentConfig] = useState({
-    amount: 3499,
-    currency: 'ETB',
     accounts: {
       boa: {
         bankName: 'Bank of Abyssinia (BOA)',
@@ -45,7 +43,7 @@ export default function RegistrationPayment() {
     setLoading(true);
     try {
       const res = await api.getPaymentInfo();
-      if (res.config) {
+      if (res.config?.accounts) {
         setPaymentConfig(res.config);
       }
       if (res.payment) {
@@ -100,7 +98,6 @@ export default function RegistrationPayment() {
     }
   };
 
-  const formattedAmount = `${paymentConfig.amount.toLocaleString()} ${paymentConfig.currency}`;
   const paymentStatus = paymentData?.paymentStatus || 'UNPAID';
   const boa = paymentConfig.accounts.boa;
   const telebirr = paymentConfig.accounts.telebirr;
@@ -120,7 +117,7 @@ export default function RegistrationPayment() {
             {t('payment.title') || 'Registration Fee Settlement'}
           </h1>
           <p className="font-serif-subtle text-sm sm:text-base text-[#cfc8b4] mt-2 max-w-xl mx-auto">
-            {t('payment.subtitle', { fee: formattedAmount }) || `To seal your sacred inscription into the Sovereign Order, complete the ${formattedAmount} registration covenant via Bank of Abyssinia or Telebirr.`}
+            {t('payment.subtitle') || 'To seal your sacred inscription into the Sovereign Order, complete the registration covenant via Bank of Abyssinia or Telebirr.'}
           </p>
         </div>
 
@@ -157,7 +154,6 @@ export default function RegistrationPayment() {
           {paymentData?.paymentReference && (
             <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between text-xs font-mono text-[#a8a192]">
               <span>Recorded Reference: <strong className="text-[#ffd966]">{paymentData.paymentReference}</strong> ({paymentData.paymentMethod})</span>
-              <span>Required: <strong className="text-emerald-400">{formattedAmount}</strong></span>
             </div>
           )}
         </div>
@@ -184,9 +180,6 @@ export default function RegistrationPayment() {
                   </span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-600/40 text-emerald-300 font-mono text-xs font-bold">
-                {formattedAmount}
-              </span>
             </div>
 
             <div className="space-y-3 pt-2 text-xs font-mono">
@@ -272,9 +265,6 @@ export default function RegistrationPayment() {
                   </span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-600/40 text-emerald-300 font-mono text-xs font-bold">
-                {formattedAmount}
-              </span>
             </div>
 
             <div className="space-y-3 pt-2 text-xs font-mono">
@@ -352,7 +342,7 @@ export default function RegistrationPayment() {
                 {t('payment.submitTitle') || 'Submit Sacred Payment Proof'}
               </h3>
               <p className="font-serif-subtle text-xs text-[#a8a192]">
-                {t('payment.submitSubtitle') || `After completing your transfer of ${formattedAmount}, input the transaction reference code received from BOA or Telebirr.`}
+                {t('payment.submitSubtitle') || 'After completing your transfer, input the transaction reference code received from BOA or Telebirr.'}
               </p>
             </div>
           </div>
@@ -442,7 +432,7 @@ export default function RegistrationPayment() {
               >
                 {submitting
                   ? (t('payment.transmitting') || 'Inscribing Proof into Tribunal Vault...')
-                  : (t('payment.submitBtn') || `Submit Consecration Proof (${formattedAmount})`)}
+                  : (t('payment.submitBtn') || 'Submit Consecration Proof')}
               </GoldButton>
             </div>
           </form>

@@ -6,8 +6,6 @@ const router = express.Router();
 
 // Registration payment details
 const PAYMENT_CONFIG = {
-  amount: 3499,
-  currency: 'ETB',
   accounts: {
     boa: {
       bankName: 'Bank of Abyssinia (BOA)',

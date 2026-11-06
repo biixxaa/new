@@ -107,7 +107,7 @@ export default function MemberDashboard() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-cinzel uppercase tracking-wider text-[#d4af37] font-bold">
-                  {t('dashboard.paymentNavTitle') || 'Registration Initiation Fee (3,499 ETB)'}
+                  {t('dashboard.paymentNavTitle') || 'Registration Initiation Fee'}
                 </span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
                   application?.payment_status === 'VERIFIED'
@@ -124,7 +124,7 @@ export default function MemberDashboard() {
                 </span>
               </div>
               <p className="font-serif-subtle text-xs sm:text-sm text-[#ccc5b0] mt-1 max-w-xl">
-                {t('payment.navCardSummary') || 'New members must settle the 3,499 ETB fee through Bank of Abyssinia (BOA: 242982037 - Biniam Miheret) or Telebirr (0955912092 - Biniam Miheret).'}
+                {t('payment.navCardSummary') || 'New members must settle the registration fee through Bank of Abyssinia (BOA: 242982037 - Biniam Miheret) or Telebirr (0955912092 - Biniam Miheret).'}
               </p>
             </div>
           </div>

@@ -237,7 +237,7 @@
   },
   "payment": {
     "title": "Registration Fee Settlement",
-    "subtitle": "New members must settle the 3,499 ETB registration covenant through Bank of Abyssinia or Telebirr.",
+    "subtitle": "New members must settle the registration covenant through Bank of Abyssinia or Telebirr.",
     "consecrationFeeBadge": "Initiation Consecration Fee",
     "statusLabel": "Covenant Settlement Status",
     "statusVerified": "PAID & SANCTIFIED",
@@ -247,11 +247,11 @@
     "settleFeeBtn": "Settle Registration Fee",
     "viewReceiptBtn": "View Payment Record",
     "submitTitle": "Submit Sacred Payment Proof",
-    "submitSubtitle": "After completing your transfer of 3,499 ETB, input the transaction reference code received from BOA or Telebirr.",
+    "submitSubtitle": "After completing your transfer, input the transaction reference code received from BOA or Telebirr.",
     "chosenMethodLabel": "Payment Gateway Used",
     "refCodeLabel": "Transaction Reference / Confirmation Code",
     "optionalNotesLabel": "Additional Notes / Sender Phone (Optional)",
-    "submitBtn": "Submit Consecration Proof (3,499 ETB)",
+    "submitBtn": "Submit Consecration Proof",
     "transmitting": "Inscribing Proof into Tribunal Vault...",
     "errorRefRequired": "Please enter a valid transaction reference code."
   },
