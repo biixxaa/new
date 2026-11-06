@@ -18,13 +18,99 @@ export function formatOtpMessage(otp, language = 'en') {
 }
 
 /**
+ * SMSEthiopia Provider Implementation
+ * Standard Ethiopian SMS Gateway (smsethiopia.com)
+ * API Spec:
+ *   POST https://smsethiopia.com/api/sms/send
+ *   Header: KEY: <API_KEY>
+ *   Body: { msisdn: "251908426432", text: "..." }
+ */
+export class SMSEthiopiaProvider {
+  constructor() {
+    this.name = 'SMSEthiopia';
+    this.apiKey = process.env.SMSETHIOPIA_API_KEY || '';
+    this.apiUrl = process.env.SMSETHIOPIA_ENDPOINT || 'https://smsethiopia.com/api/sms/send';
+  }
+
+  isConfigured() {
+    return Boolean(
+      this.apiKey &&
+      this.apiKey.trim().length > 0 &&
+      !this.apiKey.includes('YOUR_ACTUAL') &&
+      !this.apiKey.includes('placeholder')
+    );
+  }
+
+  formatMsisdn(phoneNumber) {
+    if (!phoneNumber) return '';
+    let cleaned = String(phoneNumber).replace(/[\s\-\(\)]/g, '');
+    if (cleaned.startsWith('+')) {
+      cleaned = cleaned.substring(1);
+    }
+    if (cleaned.startsWith('0')) {
+      cleaned = '251' + cleaned.substring(1);
+    }
+    return cleaned;
+  }
+
+  async sendSms({ to, message }) {
+    if (!this.isConfigured()) {
+      throw new Error('SMSEthiopia API key not configured');
+    }
+
+    const msisdn = this.formatMsisdn(to);
+
+    try {
+      const payload = {
+        msisdn,
+        text: message,
+      };
+
+      const response = await axios.post(this.apiUrl, payload, {
+        headers: {
+          KEY: this.apiKey,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        timeout: 10000,
+      });
+
+      if (
+        response.data &&
+        (response.data.status === 'success' ||
+          response.data.status === true ||
+          response.data.code === 200 ||
+          response.data.status === 200 ||
+          (!response.data.error && response.status === 200))
+      ) {
+        return {
+          success: true,
+          provider: this.name,
+          messageId: response.data.msg_id || response.data.message_id || response.data.id || `smseth-${Date.now()}`,
+          raw: response.data,
+        };
+      } else {
+        const errorDetail = response.data?.message || response.data?.error || 'SMSEthiopia returned an unfulfilled dispatch code';
+        throw new Error(`SMSEthiopia Error: ${errorDetail}`);
+      }
+    } catch (err) {
+      if (err.response) {
+        const errorMsg = err.response.data?.message || err.response.data?.error || `HTTP ${err.response.status}`;
+        throw new Error(`SMSEthiopia transmission failed: ${errorMsg}`);
+      }
+      throw new Error(`SMSEthiopia network failure: ${err.message}`);
+    }
+  }
+}
+
+/**
  * eSMS Africa SMS Provider Implementation
  */
-class ESMSAfricaProvider {
+export class ESMSAfricaProvider {
   constructor() {
     this.name = 'eSMS Africa';
     this.apiKey = process.env.ESMS_AFRICA_API_KEY || '';
-    this.senderId = process.env.ESMS_AFRICA_SENDER_ID || ''; // Approved branded sender ID or blank for provider-assigned
+    this.senderId = process.env.ESMS_AFRICA_SENDER_ID || '';
     this.apiUrl = process.env.ESMS_AFRICA_ENDPOINT || 'https://api.esmsafrica.com/v1/sms/send';
   }
 
@@ -82,13 +168,14 @@ class ESMSAfricaProvider {
 export class SmsService {
   constructor() {
     this.providers = {
+      smsethiopia: new SMSEthiopiaProvider(),
       esms_africa: new ESMSAfricaProvider(),
     };
-    this.activeProviderKey = process.env.SMS_PROVIDER || 'esms_africa';
+    this.activeProviderKey = (process.env.SMS_PROVIDER || 'smsethiopia').toLowerCase();
   }
 
   getProvider() {
-    return this.providers[this.activeProviderKey] || this.providers.esms_africa;
+    return this.providers[this.activeProviderKey] || this.providers.smsethiopia;
   }
 
   async sendOtpSms({ phoneNumber, otp, language = 'en' }) {
@@ -110,13 +197,13 @@ export class SmsService {
     }
 
     // Development / Sandbox Mode (if no live API key in environment)
-    console.log(`⚠️  [SMS Service - Dev Sandbox] Live API credentials not detected. Simulating real carrier delivery.`);
+    console.log(`⚠️  [SMS Service - Dev Sandbox] Live API credentials not configured for ${provider.name}. Simulating carrier delivery.`);
     console.log(`💬  [SMS Message Body]: "${message}"`);
     console.log(`🔑  [Dev OTP Key]: ${otp}`);
 
     return {
       success: true,
-      provider: 'Dev Sandbox Logger (eSMS Africa ready)',
+      provider: `${provider.name} Dev Sandbox`,
       messageId: `dev-sigil-${Date.now()}`,
       isSandbox: true,
       sandboxOtp: otp, // only in non-production
@@ -126,4 +213,3 @@ export class SmsService {
 
 export const smsService = new SmsService();
 export default smsService;
-
