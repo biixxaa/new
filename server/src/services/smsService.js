@@ -38,20 +38,40 @@ export function formatOtpMessage(otp, language = 'en') {
 export class SMSEthiopiaProvider {
   constructor() {
     this.name = 'SMSEthiopia';
-    this.apiKey = process.env.SMSETHIOPIA_API_KEY || '';
-    this.senderId = process.env.SMSETHIOPIA_SENDER_ID || '';
-    this.apiUrl = process.env.SMSETHIOPIA_ENDPOINT || 'https://smsethiopia.com/api/sms/send';
+    this._apiKey = null;
+    this._senderId = null;
+  }
+
+  get apiKey() {
+    return this._apiKey !== null ? this._apiKey : (process.env.SMSETHIOPIA_API_KEY || '');
+  }
+
+  set apiKey(val) {
+    this._apiKey = val;
+  }
+
+  get senderId() {
+    return this._senderId !== null ? this._senderId : (process.env.SMSETHIOPIA_SENDER_ID || '');
+  }
+
+  set senderId(val) {
+    this._senderId = val;
+  }
+
+  get apiUrl() {
+    return process.env.SMSETHIOPIA_ENDPOINT || 'https://smsethiopia.com/api/sms/send';
   }
 
   /**
    * Validates if legitimate credentials are present
    */
   isConfigured() {
+    const key = this.apiKey;
     return Boolean(
-      this.apiKey &&
-      this.apiKey.trim().length > 0 &&
-      !this.apiKey.includes('YOUR_ACTUAL') &&
-      !this.apiKey.includes('placeholder')
+      key &&
+      key.trim().length > 0 &&
+      !key.includes('YOUR_ACTUAL') &&
+      !key.includes('placeholder')
     );
   }
 
@@ -105,33 +125,36 @@ export class SMSEthiopiaProvider {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        timeout: 12000,
+        timeout: 20000,
       });
 
       const resData = response.data;
 
-      // Handle standard SMSEthiopia success responses
+      // Handle official SMSEthiopia response schema: { sent: true, id: 0, description: "Accepted for delivery" }
       if (
         response.status === 200 &&
-        (resData?.status === 'success' ||
+        (resData?.sent === true ||
+          resData?.description === 'Accepted for delivery' ||
+          resData?.status === 'success' ||
           resData?.message === 'Accepted Successfully' ||
-          resData?.status === true ||
           resData?.code === 200 ||
-          (!resData?.error && !resData?.status?.toString().includes('error')))
+          (!resData?.error && !resData?.error_message))
       ) {
         return {
           success: true,
           provider: this.name,
-          messageId: resData?.msg_id || resData?.message_id || resData?.id || `smseth-${Date.now()}`,
+          messageId: resData?.id !== undefined ? String(resData.id) : (resData?.msg_id || `smseth-${Date.now()}`),
+          description: resData?.description || 'Accepted for delivery',
           raw: resData,
         };
       }
 
       // Handle structured gateway error responses
       const errorMessage =
+        resData?.error_message ||
         resData?.message ||
         resData?.error ||
-        resData?.detail ||
+        resData?.description ||
         'SMSEthiopia gateway rejected message dispatch.';
       throw new Error(`SMSEthiopia Gateway Rejection: ${errorMessage}`);
     } catch (err) {
