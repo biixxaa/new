@@ -11,23 +11,23 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "autoprefixer": "^10.6.2",
     "canvas-confetti": "^1.9.4",
     "i18next": "^26.7.1",
     "i18next-browser-languagedetector": "^8.3.0",
     "lucide-react": "^1.68.0",
+    "postcss": "^8.5.32",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-i18next": "^17.1.12",
-    "react-router-dom": "^7.18.5"
-  },
-  "devDependencies": {
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.3.0",
-    "autoprefixer": "^10.6.2",
-    "oxlint": "^1.89.0",
-    "postcss": "^8.5.32",
+    "react-router-dom": "^7.18.5",
     "tailwindcss": "^4.3.4",
     "vite": "^8.3.5"
+  },
+  "devDependencies": {
+    "oxlint": "^1.89.0"
   }
 }
