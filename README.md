@@ -15,7 +15,7 @@ Engineered with a **mysterious, exclusive, elegant black-and-gold visual directi
 | **Backend API** | Node.js, Express.js |
 | **Security** | SHA-256 salted OTP hashing, Bcrypt password hashing, JWT, Express Rate Limiter, Helmet |
 | **Database** | PostgreSQL (`pg`), with resilient embedded SQL fallback adapter |
-| **SMS Gateway** | eSMS Africa provider architecture with multilingual SMS templates |
+| **SMS Gateway** | Official SMSEthiopia provider architecture (`smsethiopia.com`) with multilingual SMS templates |
 
 ---
 
@@ -140,11 +140,12 @@ JWT_EXPIRES_IN=7d
 # PostgreSQL Connection (Optional: auto-uses embedded engine if unset)
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/illuminati_db
 
-# eSMS Africa Gateway
-SMS_PROVIDER=esms_africa
-ESMS_AFRICA_API_KEY=your_esms_api_key_here
-ESMS_AFRICA_SENDER_ID=ORDO
-ESMS_AFRICA_ENDPOINT=https://api.esmsafrica.com/v1/sms/send
+# Official SMSEthiopia Gateway (smsethiopia.com)
+SMS_PROVIDER=smsethiopia
+SMSETHIOPIA_API_KEY=your_smsethiopia_api_key_here
+SMSETHIOPIA_SENDER_ID=
+SMSETHIOPIA_TEST_NUMBER=251908426432
+SMSETHIOPIA_ENDPOINT=https://smsethiopia.com/api/sms/send
 ```
 
 ### 3. Run Development Servers

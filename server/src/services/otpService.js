@@ -25,10 +25,10 @@ export function hashOtp(otp, salt) {
  * Initiate and dispatch an OTP for a given phone number
  */
 export async function sendOtpForPhone(phoneNumber, language = 'en') {
-  // 1. Check cooldown from latest active record
+  // 1. Check cooldown from latest record
   const latestQuery = `
     SELECT id, created_at FROM otp_verifications 
-    WHERE phone_number = $1 AND is_used = false 
+    WHERE phone_number = $1 
     ORDER BY created_at DESC LIMIT 1
   `;
   const latestRes = await db.query(latestQuery, [phoneNumber]);
@@ -70,7 +70,7 @@ export async function sendOtpForPhone(phoneNumber, language = 'en') {
     success: true,
     phoneNumber,
     expiresInSeconds: 300,
-    debugOtp: dispatchResult.isSandbox ? otp : undefined,
+    debugOtp: process.env.NODE_ENV === 'production' ? undefined : (dispatchResult.isSandbox ? otp : undefined),
   };
 }
 
@@ -142,7 +142,7 @@ export async function verifyOtpForPhone(phoneNumber, submittedOtp) {
   await db.query('UPDATE otp_verifications SET is_used = true WHERE id = $1', [record.id]);
 
   // 6. Update user's is_phone_verified in database if user exists
-  await db.query('UPDATE users SET is_phone_verified = true WHERE phone_number = $1', [true, phoneNumber]);
+  await db.query('UPDATE users SET is_phone_verified = true WHERE phone_number = $1', [phoneNumber]);
 
   return {
     verified: true,

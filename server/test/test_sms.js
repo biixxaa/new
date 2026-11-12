@@ -6,22 +6,36 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-import { smsService } from '../src/services/smsService.js';
+import { SMSEthiopiaProvider, smsService } from '../src/services/smsService.js';
 
 async function runTest() {
   const targetNumber = process.argv[2] || process.env.SMSETHIOPIA_TEST_NUMBER || '251908426432';
   const lang = process.argv[3] || 'en';
-  const testOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  const customKey = process.argv[4] || process.env.SMSETHIOPIA_API_KEY;
 
-  console.log('==================================================');
-  console.log('   ORDO ILLUMINATORUM - SMS GATEWAY TEST UTILITY  ');
-  console.log('==================================================');
-  console.log(`Active Provider : ${process.env.SMS_PROVIDER || 'smsethiopia'}`);
-  console.log(`Target Phone    : ${targetNumber}`);
-  console.log(`Language        : ${lang}`);
-  console.log(`Generated OTP   : ${testOtp}`);
-  console.log(`API Key Configured : ${process.env.SMSETHIOPIA_API_KEY && process.env.SMSETHIOPIA_API_KEY !== 'YOUR_ACTUAL_API_KEY' ? 'YES (Live Mode)' : 'NO (Sandbox Mode)'}`);
-  console.log('--------------------------------------------------');
+  if (process.argv[4]) {
+    process.env.SMSETHIOPIA_API_KEY = customKey;
+    smsService.provider.apiKey = customKey;
+  }
+
+  const testOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  const provider = smsService.getProvider();
+  const formattedMsisdn = provider.formatMsisdn(targetNumber);
+
+  console.log('===============================================================');
+  console.log('      ORDO ILLUMINATORUM — SMSEthiopia Gateway Verification    ');
+  console.log('===============================================================');
+  console.log(`Gateway Provider    : ${provider.name} (Official API)`);
+  console.log(`Endpoint            : ${provider.apiUrl}`);
+  console.log(`Raw Phone Input     : ${targetNumber}`);
+  console.log(`Normalized MSISDN   : ${formattedMsisdn}`);
+  console.log(`Language Template   : ${lang}`);
+  console.log(`Generated OTP       : ${testOtp}`);
+  console.log(`API Key Configured  : ${provider.isConfigured() ? 'YES (Live Gateway Dispatch)' : 'NO (Development Sandbox)'}`);
+  if (provider.senderId) {
+    console.log(`Sender ID (Custom)  : ${provider.senderId}`);
+  }
+  console.log('---------------------------------------------------------------');
 
   try {
     const result = await smsService.sendOtpSms({
@@ -30,26 +44,38 @@ async function runTest() {
       language: lang,
     });
 
-    console.log('--------------------------------------------------');
-    console.log('Result Status   : SUCCESS');
-    console.log('Provider Used   : ' + result.provider);
-    console.log('Message ID      : ' + result.messageId);
-    console.log('Is Sandbox      : ' + result.isSandbox);
+    console.log('---------------------------------------------------------------');
+    console.log('Status              : SUCCESS');
+    console.log(`Provider            : ${result.provider}`);
+    console.log(`Message ID          : ${result.messageId}`);
+    console.log(`Is Sandbox Mode     : ${result.isSandbox}`);
+    
     if (result.isSandbox) {
-      console.log('⚠️  Note: Running in sandbox mode because SMSETHIOPIA_API_KEY is placeholder.');
-      console.log('👉 To send real SMS to your phone, set SMSETHIOPIA_API_KEY in server/.env with your real key.');
+      console.log('\n⚠️  [Development Sandbox Active]');
+      console.log('Reason: SMSETHIOPIA_API_KEY in server/.env is set to a placeholder.');
+      console.log('To dispatch live SMS to your physical device using your 100 free test credits:');
+      console.log('  1. Log into your account at https://smsethiopia.com');
+      console.log('  2. Copy your API Key from Console -> API Keys');
+      console.log('  3. In your dashboard, ensure your test number is added / whitelisted');
+      console.log('  4. Set SMSETHIOPIA_API_KEY=<your_key> in server/.env');
+      console.log(`  5. Run: node server/test/test_sms.js ${targetNumber}`);
     } else {
-      console.log('🎉 Live SMS dispatched successfully to carrier gateway!');
+      console.log('\n🎉 [LIVE TELECOM DISPATCH CONFIRMED]');
+      console.log(`A real SMS containing OTP [${testOtp}] was accepted by SMSEthiopia for delivery to ${formattedMsisdn}.`);
     }
-    console.log('==================================================');
+    console.log('===============================================================');
   } catch (error) {
-    console.error('--------------------------------------------------');
-    console.error('Result Status   : FAILED');
-    console.error('Error Details   : ' + error.message);
-    console.log('==================================================');
+    console.error('---------------------------------------------------------------');
+    console.error('Status              : DISPATCH FAILED');
+    console.error(`Error Message       : ${error.message}`);
+    console.error('\n🛠️  Troubleshooting Checklist:');
+    console.error('  • Check if your API Key in server/.env is correct and active.');
+    console.error('  • Free trial accounts (100 free SMS) can only send to verified test numbers.');
+    console.error('  • Ensure your recipient number is active and capable of receiving SMS.');
+    console.error('  • Check if your SMSEthiopia account balance has remaining credits.');
+    console.error('===============================================================');
     process.exit(1);
   }
 }
 
 runTest();
-

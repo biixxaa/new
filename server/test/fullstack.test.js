@@ -73,6 +73,55 @@ test('3. Cryptographic OTP Generation & Verification', async (t) => {
     assert.equal(verifyRes.verified, true);
   });
 
+  await t.test('Enforces resend cooldown limit (429 Too Many Requests)', async () => {
+    const phone = '+251911999888';
+    try {
+      await sendOtpForPhone(phone, 'en');
+      assert.fail('Should have blocked immediate resend');
+    } catch (err) {
+      assert.equal(err.status, 429);
+      assert.ok(err.message.includes('Please wait'));
+    }
+  });
+
+  await t.test('Prevents replay/reuse of already-verified OTP', async () => {
+    const phone = '+251911777666';
+    const sendRes = await sendOtpForPhone(phone, 'en');
+    assert.ok(sendRes.debugOtp);
+
+    // First verification succeeds
+    const verifyRes = await verifyOtpForPhone(phone, sendRes.debugOtp);
+    assert.equal(verifyRes.verified, true);
+
+    // Replay attempt must fail (already marked is_used)
+    try {
+      await verifyOtpForPhone(phone, sendRes.debugOtp);
+      assert.fail('Replay of used OTP should fail');
+    } catch (err) {
+      assert.equal(err.status, 404);
+      assert.ok(err.message.includes('No active verification code found'));
+    }
+  });
+
+  await t.test('Rejects expired OTP codes (410 Gone)', async () => {
+    const phone = '+251911555444';
+    const sendRes = await sendOtpForPhone(phone, 'en');
+    
+    // Manually backdate expiry to simulate 5 minutes passing
+    await query('UPDATE otp_verifications SET expires_at = $1 WHERE phone_number = $2', [
+      new Date(Date.now() - 1000).toISOString(),
+      phone,
+    ]);
+
+    try {
+      await verifyOtpForPhone(phone, sendRes.debugOtp);
+      assert.fail('Expired OTP should have failed');
+    } catch (err) {
+      assert.equal(err.status, 410);
+      assert.ok(err.message.includes('expired'));
+    }
+  });
+
   await t.test('Fails on incorrect OTP and decrements attempts', async () => {
     const phone = '+251922334455';
     await sendOtpForPhone(phone, 'en');
@@ -210,6 +259,34 @@ test('7. SMSEthiopia Gateway Integration & Formatting', async (t) => {
   await t.test('smsService selects SMSEthiopia as default provider', () => {
     const activeProvider = smsService.getProvider();
     assert.equal(activeProvider.name, 'SMSEthiopia');
+  });
+
+  await t.test('sendSms rejects unconfigured provider with clear error', async () => {
+    const unconfigured = new SMSEthiopiaProvider();
+    unconfigured.apiKey = '';
+    await assert.rejects(
+      async () => {
+        await unconfigured.sendSms({ to: '0908426432', message: 'Test' });
+      },
+      {
+        message: 'SMSEthiopia API key is not configured in environment variables.',
+      }
+    );
+  });
+
+  await t.test('Production mode refuses to mock SMS when credentials are unset', async () => {
+    const prodSms = new (smsService.constructor)();
+    prodSms.isProduction = true;
+    prodSms.provider.apiKey = '';
+
+    await assert.rejects(
+      async () => {
+        await prodSms.sendOtpSms({ phoneNumber: '+251908426432', otp: '123456' });
+      },
+      {
+        message: 'SMS Service Configuration Error: Real SMSETHIOPIA_API_KEY must be configured in production environment variables.',
+      }
+    );
   });
 });
 

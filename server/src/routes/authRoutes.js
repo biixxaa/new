@@ -29,7 +29,7 @@ router.post('/send-otp', otpRequestLimiter, async (req, res, next) => {
       phoneNumber: validation.normalized,
       carrier: validation.carrier,
       expiresInSeconds: result.expiresInSeconds,
-      debugOtp: result.debugOtp, // Present only in dev/sandbox mode
+      debugOtp: process.env.NODE_ENV === 'production' ? undefined : result.debugOtp,
     });
   } catch (err) {
     next(err);

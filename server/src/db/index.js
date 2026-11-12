@@ -267,14 +267,27 @@ export async function query(sql, params = []) {
   // SELECT latest active OTP
   if (lower.includes('from otp_verifications') && lower.includes('where phone_number = $1')) {
     const phone = params[0];
-    const records = embeddedStore.otp_verifications
-      .filter((o) => o.phone_number === phone && !o.is_used)
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    let records = embeddedStore.otp_verifications.filter((o) => o.phone_number === phone);
+    if (lower.includes('is_used = false')) {
+      records = records.filter((o) => !o.is_used);
+    }
+    records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return { rows: records.slice(0, 1) };
   }
 
-  // UPDATE otp_verifications (increment attempts / mark used)
+  // UPDATE otp_verifications (increment attempts / mark used / set expires_at)
   if (lower.startsWith('update otp_verifications')) {
+    if (lower.includes('where phone_number =')) {
+      const phone = params[params.length - 1];
+      const records = embeddedStore.otp_verifications.filter((o) => o.phone_number === phone);
+      for (const record of records) {
+        if (lower.includes('expires_at = $1')) {
+          record.expires_at = params[0];
+        }
+      }
+      return { rows: records };
+    }
+
     const id = Number(params[params.length - 1]);
     const record = embeddedStore.otp_verifications.find((o) => o.id === id);
     if (record) {
@@ -283,6 +296,9 @@ export async function query(sql, params = []) {
       }
       if (lower.includes('attempts = attempts + 1')) {
         record.attempts += 1;
+      }
+      if (lower.includes('expires_at = $1')) {
+        record.expires_at = params[0];
       }
       return { rows: [record] };
     }
