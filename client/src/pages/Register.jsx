@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Shield, Lock, User, Phone, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Shield, Lock, User, Phone, CheckCircle2, AlertCircle, Sparkles, Signal } from 'lucide-react';
 import GeometricEye from '../components/GeometricEye';
 import GoldButton from '../components/GoldButton';
 import { validateAndNormalizePhone } from '../utils/phoneValidator';
@@ -184,8 +184,20 @@ export default function Register() {
                   {t('register.phone')}
                 </label>
                 {validation.phoneCarrier && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-amber-950/40 border border-amber-600/40 text-amber-300">
-                    <Sparkles className="w-3 h-3 text-[#d4af37]" />
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded border transition-all ${
+                      validation.phoneCarrier === 'Safaricom Ethiopia'
+                        ? 'bg-emerald-950/70 border-emerald-500/60 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                        : validation.phoneCarrier === 'Ethio Telecom'
+                        ? 'bg-amber-950/70 border-amber-500/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                        : 'bg-zinc-900/80 border-zinc-700 text-zinc-300'
+                    }`}
+                  >
+                    {validation.phoneCarrier === 'Safaricom Ethiopia' ? (
+                      <Signal className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                    )}
                     {validation.phoneCarrier}
                   </span>
                 )}

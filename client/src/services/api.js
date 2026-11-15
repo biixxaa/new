@@ -21,7 +21,10 @@ async function request(endpoint, options = {}) {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      const error = new Error(data.message || 'Network request failed');
+      const fallbackMsg = res.status === 404 || res.status === 405
+        ? 'Backend API not reachable. Ensure Render backend is deployed and VITE_API_URL is configured.'
+        : 'Network request failed';
+      const error = new Error(data.message || fallbackMsg);
       error.status = res.status;
       error.data = data;
       throw error;
@@ -29,6 +32,11 @@ async function request(endpoint, options = {}) {
 
     return data;
   } catch (err) {
+    if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+      const connErr = new Error('Cannot connect to backend server. Ensure Render backend is running and VITE_API_URL is configured.');
+      connErr.status = 0;
+      throw connErr;
+    }
     throw err;
   }
 }

@@ -54,28 +54,10 @@ export function validateAndNormalizePhone(rawPhone) {
 
   if (e164.startsWith('+251')) {
     const nineDigit = e164.slice(4);
-    const prefix2 = nineDigit.slice(0, 2);
-    const prefix3 = nineDigit.slice(0, 3);
-
-    if (prefix2.startsWith('9')) {
+    if (nineDigit.startsWith('9')) {
       carrier = 'Ethio Telecom';
-    } else if (
-      prefix3 === '770' ||
-      prefix3 === '771' ||
-      prefix3 === '772' ||
-      prefix3 === '773' ||
-      prefix3 === '774' ||
-      prefix3 === '775' ||
-      prefix3 === '776' ||
-      prefix3 === '777' ||
-      prefix3 === '778' ||
-      prefix3 === '779'
-    ) {
+    } else if (nineDigit.startsWith('7')) {
       carrier = 'Safaricom Ethiopia';
-    } else if (prefix2.startsWith('7')) {
-      carrier = prefix3.startsWith('70') || prefix3.startsWith('71') || prefix3.startsWith('72')
-        ? 'Ethio Telecom'
-        : 'Safaricom Ethiopia';
     } else {
       carrier = 'Ethiopia Mobile';
     }

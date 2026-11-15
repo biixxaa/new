@@ -185,7 +185,19 @@ export default function VerifyOtp() {
           </p>
           <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded bg-[#16151f] border border-[#d4af37]/30 text-xs font-mono text-[#ffd966]">
             <span>{phoneNumber}</span>
-            {carrier && <span className="text-[10px] text-[#aa820a]">({carrier})</span>}
+            {carrier && (
+              <span
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
+                  carrier === 'Safaricom Ethiopia'
+                    ? 'bg-emerald-950/70 border-emerald-500/60 text-emerald-300'
+                    : carrier === 'Ethio Telecom'
+                    ? 'bg-amber-950/70 border-amber-500/60 text-amber-300'
+                    : 'text-[#aa820a] border-[#aa820a]/30'
+                }`}
+              >
+                {carrier}
+              </span>
+            )}
           </div>
         </div>
 

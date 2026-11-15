@@ -22,6 +22,13 @@ test('1. Phone Number Validation & E.164 Normalization', async (t) => {
     assert.equal(res.carrier, 'Safaricom Ethiopia');
   });
 
+  await t.test('Correctly identifies 070 series (e.g. 0707816833) as Safaricom Ethiopia', () => {
+    const res = validateAndNormalizePhone('0707816833');
+    assert.equal(res.isValid, true);
+    assert.equal(res.normalized, '+251707816833');
+    assert.equal(res.carrier, 'Safaricom Ethiopia');
+  });
+
   await t.test('Accepts pre-formatted E.164 +251912345678', () => {
     const res = validateAndNormalizePhone('+251912345678');
     assert.equal(res.isValid, true);
